@@ -1,0 +1,69 @@
+// Updated version with theme, background, and better UI import React, { useState } from "react"; import { Card, CardContent } from "@/components/ui/card"; import { Button } from "@/components/ui/button"; import { Progress } from "@/components/ui/progress"; import { BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
+
+const allCards = [ { name: "Warrior", power: 8, image: "/cards/warrior.png" }, { name: "Mage", power: 6, image: "/cards/mage.png" }, { name: "Archer", power: 7, image: "/cards/archer.png" }, { name: "Paladin", power: 9, image: "/cards/paladin.png" }, { name: "Assassin", power: 7, image: "/cards/assassin.png" }, { name: "Beast", power: 5, image: "/cards/beast.png" }, ];
+
+export default function GameApp() { const [myCards, setMyCards] = useState([]); const [team, setTeam] = useState([]); const [enemyTeam, setEnemyTeam] = useState([]); const [result, setResult] = useState(null);
+
+const gacha = () => { const newCard = allCards[Math.floor(Math.random() * allCards.length)]; setMyCards([...myCards, newCard]); };
+
+const addToTeam = (card) => { if (team.length < 5) setTeam([...team, card]); };
+
+const fight = () => { if (team.length !== 5) { alert("ต้องเลือกครบ 5 ใบก่อนต่อสู้"); return; } const enemy = Array.from({ length: 5 }, () => allCards[Math.floor(Math.random() * allCards.length)]); setEnemyTeam(enemy); const myPower = team.reduce((sum, c) => sum + c.power, 0); const enemyPower = enemy.reduce((sum, c) => sum + c.power, 0); setResult(myPower >= enemyPower ? "You Win!" : "You Lose!"); };
+
+return ( <div className="min-h-screen bg-gradient-to-b from-gray-800 to-black text-white p-4 font-sans"> <h1 className="text-4xl font-bold mb-4 text-center">Fantasy Card Battle</h1>
+
+<div className="flex justify-center mb-6">
+    <Button onClick={gacha}>สุ่มการ์ด</Button>
+  </div>
+
+  <h2 className="text-xl mb-2">การ์ดของคุณ</h2>
+  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-6">
+    {myCards.map((card, i) => (
+      <Card key={i} className="bg-gray-900 hover:scale-105 transition-all cursor-pointer" onClick={() => addToTeam(card)}>
+        <CardContent className="p-2">
+          <img src={card.image} alt={card.name} className="w-full h-28 object-contain mb-1" />
+          <p className="text-sm text-center">{card.name} (Power {card.power})</p>
+        </CardContent>
+      </Card>
+    ))}
+  </div>
+
+  <h2 className="text-xl mb-2">ทีมของคุณ (เลือก 5 ใบ)</h2>
+  <div className="flex flex-wrap gap-2 mb-4">
+    {team.map((card, i) => (
+      <Card key={i} className="bg-green-900">
+        <CardContent className="p-1">
+          <img src={card.image} alt={card.name} className="w-16 h-16 object-contain" />
+          <p className="text-xs text-center">{card.name}</p>
+        </CardContent>
+      </Card>
+    ))}
+  </div>
+
+  <Button onClick={fight} disabled={team.length !== 5}>Fight!</Button>
+
+  {result && (
+    <div className="mt-6 text-center">
+      <h2 className="text-2xl mb-2">{result}</h2>
+
+      <div className="flex justify-around">
+        <div>
+          <h3 className="font-semibold mb-1">Your Team</h3>
+          {team.map((card, i) => (
+            <p key={i}>{card.name} - {card.power}</p>
+          ))}
+        </div>
+
+        <div>
+          <h3 className="font-semibold mb-1">Enemy Team</h3>
+          {enemyTeam.map((card, i) => (
+            <p key={i}>{card.name} - {card.power}</p>
+          ))}
+        </div>
+      </div>
+    </div>
+  )}
+</div>
+
+); }
+
